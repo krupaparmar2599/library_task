@@ -1,0 +1,21 @@
+I created project folder named library_task using Core PHP with PDO and MySQL.
+
+Added .htaccess file to route all incoming requests to index.php.
+
+In index.php, I included required files and this file runs first when request comes from browser.
+
+Then I created route system. I used parse_url() and explode() to get URL parts, and managed local folder structure using array_shift().
+
+Based on route, I called correct controller file like Book, Member or Management.
+
+In controller, I used private instance for model file to keep code clean and easy to use.
+
+I created config/database.php file where I made PDO connection and created required tables like books, members, management.
+
+In model file, I wrote database queries using PDO methods like prepare(), execute(), fetch() etc.
+
+I added CRUD for books and members, and issue/return book feature with all validations like active or deleted records, already issued book etc.
+
+I used json_decode(file_get_contents("php://input")) for request data and json_encode() for response.
+
+I have attached postman collection and Database for your review. 

@@ -1,0 +1,11 @@
+RewriteEngine On
+
+# Make sure the base is correct
+RewriteBase /Projects/library_task/
+
+# If the requested file or directory does NOT exist
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Send the request to index.php
+RewriteRule ^(.*)$ index.php [QSA,L]
