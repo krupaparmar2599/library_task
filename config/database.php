@@ -21,6 +21,8 @@ class Database
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
             $this->createTables();
+                    $this->updateTables();
+
         } catch (PDOException $e) {
             echo json_encode(["error" => "Connection failed: " . $e->getMessage()]);
             exit;
@@ -73,5 +75,19 @@ class Database
         );
     ";
         $this->conn->exec($sql);
+    }
+    private function updateTables()
+    {
+        // Check and add new columns if not exist
+        $check = $this->conn->query("SHOW COLUMNS FROM members LIKE 'token'");
+        if ($check->rowCount() === 0) {
+            $alter = "
+            ALTER TABLE members 
+            ADD COLUMN password VARCHAR(255) AFTER mobile,
+            ADD COLUMN token VARCHAR(255) DEFAULT NULL AFTER password,
+            ADD COLUMN last_login DATETIME DEFAULT NULL AFTER token
+        ";
+            $this->conn->exec($alter);
+        }
     }
 }

@@ -32,6 +32,39 @@ class Management
             return ['status' => false, 'error' => $e->getMessage()];
         }
     }
+    public function isBookActive($bookId)
+    {
+        $query = "SELECT id FROM books WHERE id = :book_id AND is_active = 1 AND is_delete = 0";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':book_id', $bookId);
+        $stmt->execute();
+        return $stmt->rowCount() > 0;
+    }
+
+    public function isMemberActive($memberId)
+    {
+        $query = "SELECT id FROM members WHERE id = :member_id AND is_active = 1 AND is_delete = 0";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':member_id', $memberId);
+        $stmt->execute();
+        return $stmt->rowCount() > 0;
+    }
+
+    public function isBookAlreadyIssued($bookId, $memberId)
+    {
+        try {
+            $query = "SELECT id FROM management WHERE book_id = :book_id AND member_id = :member_id AND is_delete = 0 AND return_date IS NULL";
+
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':book_id', $bookId);
+            $stmt->bindParam(':member_id', $memberId);
+            $stmt->execute();
+
+            return $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
 
     public function returnBook($book_id, $member_id, $return_date)
     {

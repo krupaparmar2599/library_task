@@ -26,11 +26,15 @@ class Member
 
     public function create($data)
     {
-        $stmt = $this->conn->prepare("INSERT INTO {$this->table} (name, email, mobile) VALUES (?, ?, ?)");
+        $stmt = $this->conn->prepare("INSERT INTO {$this->table} (name, email, mobile, password) VALUES (?, ?, ?,  ?)");
+        $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
+
         return $stmt->execute([
             $data['name'],
             $data['email'],
-            $data['mobile']
+            $data['mobile'],
+            $hashedPassword
+
         ]);
     }
 

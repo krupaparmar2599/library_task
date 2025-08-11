@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 08, 2025 at 11:39 AM
+-- Generation Time: Aug 11, 2025 at 08:53 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -80,7 +80,9 @@ INSERT INTO `management` (`id`, `book_id`, `member_id`, `issue_date`, `return_da
 (5, 1, 3, '2025-08-08', NULL, '2025-08-15', 1, 0, '2025-08-08 07:41:22', '2025-08-08 07:41:22'),
 (6, 2, 1, '2025-08-08', NULL, '2025-08-15', 1, 0, '2025-08-08 08:11:13', '2025-08-08 08:11:13'),
 (7, 2, 1, '2025-08-08', NULL, '2025-08-15', 1, 0, '2025-08-08 08:14:31', '2025-08-08 08:14:31'),
-(8, 2, 1, '2025-08-08', NULL, '2025-08-15', 1, 0, '2025-08-08 08:15:48', '2025-08-08 08:15:48');
+(8, 2, 1, '2025-08-08', NULL, '2025-08-15', 1, 0, '2025-08-08 08:15:48', '2025-08-08 08:15:48'),
+(9, 1, 1, '2025-08-08', '2025-08-10', '2025-08-15', 1, 0, '2025-08-11 06:34:37', '2025-08-11 06:50:33'),
+(10, 1, 1, '2025-08-08', '2025-08-10', '2025-08-15', 1, 0, '2025-08-11 06:34:58', '2025-08-11 06:50:33');
 
 -- --------------------------------------------------------
 
@@ -93,6 +95,9 @@ CREATE TABLE `members` (
   `name` varchar(255) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
   `mobile` varchar(20) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
+  `token` varchar(255) DEFAULT NULL,
+  `last_login` datetime DEFAULT NULL,
   `is_active` tinyint(4) DEFAULT 1,
   `is_delete` tinyint(4) DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
@@ -103,10 +108,11 @@ CREATE TABLE `members` (
 -- Dumping data for table `members`
 --
 
-INSERT INTO `members` (`id`, `name`, `email`, `mobile`, `is_active`, `is_delete`, `created_at`, `updated_at`) VALUES
-(1, 'Krupa Parmar', 'krupa.new@example.com', '9876543210', 1, 0, '2025-08-08 06:43:23', '2025-08-08 06:52:15'),
-(2, 'Meera', 'mk@example.com', '1234567990', 1, 0, '2025-08-08 06:47:32', '2025-08-08 06:47:32'),
-(3, 'Dhara', 'dj@example.com', '1288567990', 1, 1, '2025-08-08 06:49:00', '2025-08-08 06:53:10');
+INSERT INTO `members` (`id`, `name`, `email`, `mobile`, `password`, `token`, `last_login`, `is_active`, `is_delete`, `created_at`, `updated_at`) VALUES
+(1, 'Krupa Parmar', 'krupa.new@example.com', '9876543210', NULL, NULL, NULL, 1, 0, '2025-08-08 06:43:23', '2025-08-08 06:52:15'),
+(2, 'Meera', 'mk@example.com', '1234567990', NULL, NULL, NULL, 1, 0, '2025-08-08 06:47:32', '2025-08-08 06:47:32'),
+(3, 'Dhara', 'dj@example.com', '1288567990', NULL, NULL, NULL, 1, 1, '2025-08-08 06:49:00', '2025-08-08 06:53:10'),
+(4, 'Dhara', 'dj@example.com', '1288567990', '$2y$10$5jw51OpJLaG228nKogqLLuRJHe19r7rhmEFhFfsi38tLxM2x./gH2', 'd09e53b8c5fedc9f28fbbdd5c6fdcc972370ca21371bdb66245d62414c5c618d', '2025-08-11 11:52:40', 1, 0, '2025-08-11 05:54:35', '2025-08-11 06:22:40');
 
 --
 -- Indexes for dumped tables
@@ -146,13 +152,13 @@ ALTER TABLE `books`
 -- AUTO_INCREMENT for table `management`
 --
 ALTER TABLE `management`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `members`
 --
 ALTER TABLE `members`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Constraints for dumped tables

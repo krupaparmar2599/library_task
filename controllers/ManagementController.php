@@ -2,19 +2,47 @@
 
 require_once './models/Management.php';
 
+include_once './models/Auth.php';
+
 class ManagementController
 {
     private $management;
+
+    private $authModel;
     private $conn;
 
     public function __construct($conn)
     {
         $this->conn = $conn;
         $this->management = new Management($conn);
+        $this->authModel = new Auth($conn);
     }
 
     public function issueBook($data)
     {
+        // Check token ------------ start
+        $headers = apache_request_headers();
+        if (!isset($headers['Authorization'])) {
+            http_response_code(401);
+            echo json_encode(["error" => "Authorization token is required"]);
+            return;
+        }
+
+        $authHeader = trim($headers['Authorization']);
+        if (stripos($authHeader, 'Bearer ') === 0) {
+            $token = substr($authHeader, 7);
+        } else {
+            $token = $authHeader;
+        }
+
+        $user = $this->authModel->findByToken($token);
+        if (!$user) {
+            http_response_code(401);
+            echo json_encode(["error" => "Invalid or expired token"]);
+            return;
+        }
+        // Check token ------------ end
+
         if (
             !isset($data['book_id']) ||
             !isset($data['member_id']) ||
@@ -26,27 +54,25 @@ class ManagementController
             return;
         }
 
-        // Check book and members are valid 
-        $checkBookQuery = "SELECT id FROM books WHERE id = :book_id AND is_active = 1 AND is_delete = 0";
-        $checkBookStmt = $this->conn->prepare($checkBookQuery);
-        $checkBookStmt->bindParam(':book_id', $data['book_id']);
-        $checkBookStmt->execute();
-        if ($checkBookStmt->rowCount() === 0) {
+        // Check book and members are valid -- book alredy issued --------------
+        if (!$this->management->isBookActive($data['book_id'])) {
             http_response_code(400);
             echo json_encode(["error" => "Invalid or inactive/deleted book"]);
             return;
         }
 
-        $checkMemberQuery = "SELECT id FROM members WHERE id = :member_id AND is_active = 1 AND is_delete = 0";
-        $checkMemberStmt = $this->conn->prepare($checkMemberQuery);
-        $checkMemberStmt->bindParam(':member_id', $data['member_id']);
-        $checkMemberStmt->execute();
-        if ($checkMemberStmt->rowCount() === 0) {
+        if (!$this->management->isMemberActive($data['member_id'])) {
             http_response_code(400);
             echo json_encode(["error" => "Invalid or inactive/deleted member"]);
             return;
         }
 
+        if ($this->management->isBookAlreadyIssued($data['book_id'], $data['member_id'])) {
+            http_response_code(400);
+            echo json_encode(["error" => "This book is already issued to this member and not returned yet"]);
+            return;
+        }
+        // -------------------------
         $response = $this->management->issueBook(
             $data['book_id'],
             $data['member_id'],
@@ -67,6 +93,29 @@ class ManagementController
 
     public function returnBook($data)
     {
+        // Check token ------------ start
+        $headers = apache_request_headers();
+        if (!isset($headers['Authorization'])) {
+            http_response_code(401);
+            echo json_encode(["error" => "Authorization token is required"]);
+            return;
+        }
+
+        $authHeader = trim($headers['Authorization']);
+        if (stripos($authHeader, 'Bearer ') === 0) {
+            $token = substr($authHeader, 7);
+        } else {
+            $token = $authHeader;
+        }
+
+        $user = $this->authModel->findByToken($token);
+        if (!$user) {
+            http_response_code(401);
+            echo json_encode(["error" => "Invalid or expired token"]);
+            return;
+        }
+        // Check token ------------ end
+
         if (
             !isset($data['book_id']) ||
             !isset($data['member_id']) ||

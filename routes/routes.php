@@ -13,6 +13,9 @@ $memberController = new MemberController($conn);
 require_once './controllers/ManagementController.php';
 $managementController = new ManagementController($conn);
 
+require_once './controllers/AuthController.php';
+$authController = new AuthController($conn);
+
 $uri = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
 $method = $_SERVER['REQUEST_METHOD'];
 $segments = explode('/', $uri);
@@ -25,6 +28,19 @@ if ($segments[0] === 'Projects' || $segments[0] === 'library_task') {
 
 $resource = $segments[0] ?? null;
 $id = $segments[1] ?? null;
+
+if ($resource === 'auth') {
+    if ($method === 'POST' && $id === 'login') {
+        $data = json_decode(file_get_contents("php://input"), true);
+        $authController->login($data);
+        return;
+    }
+    if ($method === 'POST' && $id === 'logout') {
+        $data = json_decode(file_get_contents("php://input"), true);
+        $authController->logout($data);
+        return;
+    }
+}
 
 // Books CRUD  ---------------------------------------
 if ($resource === 'books') {

@@ -32,9 +32,35 @@ class MemberController
 
     public function createMember($data)
     {
-        if (empty($data['name']) || empty($data['email']) || empty($data['mobile'])) {
+        // if (empty($data['name']) || empty($data['email']) || empty($data['mobile'])) {
+        //     http_response_code(400);
+        //     echo json_encode(["error" => "Missing required fields"]);
+        //     return;
+        // }
+        $errors = [];
+
+        if (empty($data['name'])) {
+            $errors[] = "Name is required";
+        }
+        if (empty($data['email'])) {
+            $errors[] = "Email is required";
+        } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+            $errors[] = "Invalid email format";
+        }
+        if (empty($data['mobile'])) {
+            $errors[] = "Mobile is required";
+        } elseif (!preg_match('/^[0-9]{10}$/', $data['mobile'])) {
+            $errors[] = "Mobile must be 10 digits";
+        }
+        if (empty($data['password'])) {
+            $errors[] = "Password is required";
+        } elseif (strlen($data['password']) < 6) {
+            $errors[] = "Password must be at least 6 characters";
+        }
+
+        if (!empty($errors)) {
             http_response_code(400);
-            echo json_encode(["error" => "Missing required fields"]);
+            echo json_encode(["error" => $errors]);
             return;
         }
 
